@@ -5,6 +5,11 @@ export default function Home() {
   const [message, setMessage] = useState('');
 
   const enableGuard = async () => {
+    if (!token.trim()) {
+      setMessage('Please enter a token.');
+      return;
+    }
+
     setMessage('Processing...');
     try {
       const res = await fetch('/api/guard', {
@@ -13,7 +18,7 @@ export default function Home() {
         body: JSON.stringify({ token }),
       });
       const data = await res.json();
-      setMessage(data.message);
+      setMessage(data.message || 'Done.');
     } catch {
       setMessage('Something went wrong.');
     }
@@ -87,4 +92,4 @@ export default function Home() {
       </div>
     </div>
   );
-          }
+}
