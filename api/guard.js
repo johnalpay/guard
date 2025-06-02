@@ -1,11 +1,15 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
 
   const { token } = req.body;
 
-  console.log('Received token:', token);
+  if (!token || !token.startsWith('EAAG')) {
+    return res.status(400).json({ message: 'Invalid or missing token' });
+  }
 
-  if (!token) return res.status(400).json({ message: 'Token is required' });
+  console.log('Using token:', token);
 
   const sessionId = '9b78191c-84fd-4ab6-b0aa-19b39f04a6bc';
   const clientMutationId = 'b0316dd6-3fd6-4beb-aed4-bb29c5dc64b0';
@@ -28,17 +32,17 @@ export default async function handler(req, res) {
         'User-Agent': 'Mozilla/5.0',
       },
     });
-    const result = await response.json();
 
+    const result = await response.json();
     console.log('Facebook API response:', result);
 
     if (result?.data) {
       return res.status(200).json({ message: 'Profile Guard Enabled Successfully!' });
     } else {
-      return res.status(400).json({ message: 'Failed to enable guard. Invalid token or request blocked.' });
+      return res.status(400).json({ error: result?.error || 'Unknown error' });
     }
   } catch (error) {
-    console.error('Error in API call:', error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Error during fetch:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 }
