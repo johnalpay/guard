@@ -2,6 +2,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   const { token } = req.body;
+
+  console.log('Received token:', token); // Logging for debug
+
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
   const sessionId = '9b78191c-84fd-4ab6-b0aa-19b39f04a6bc';
@@ -26,9 +29,10 @@ export default async function handler(req, res) {
     if (result && result.data) {
       return res.status(200).json({ message: 'Profile Guard Enabled Successfully!' });
     } else {
-      return res.status(400).json({ message: 'Failed to enable guard. Invalid token or blocked request.' });
+      return res.status(400).json({ message: 'Failed to enable guard. Invalid token or request blocked.' });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Error occurred while processing.' });
+    console.error('Error in API call:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 }
