@@ -3,7 +3,7 @@ export default async function handler(req, res) {
 
   const { token } = req.body;
 
-  console.log('Received token:', token); // Logging for debug
+  console.log('Received token:', token);
 
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
@@ -23,10 +23,18 @@ export default async function handler(req, res) {
   )}&method=post&doc_id=1477043292367183&query_name=IsShieldedSetMutation&strip_defaults=false&strip_nulls=false&locale=en_US&client_country_code=US&fb_api_req_friendly_name=IsShieldedSetMutation&fb_api_caller_class=IsShieldedSetMutation&access_token=${encodeURIComponent(token)}`;
 
   try {
-    const response = await fetch(url, { method: 'POST' });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0',
+      },
+    });
     const result = await response.json();
 
-    if (result && result.data) {
+    console.log('Facebook API response:', result);
+
+    if (result?.data) {
       return res.status(200).json({ message: 'Profile Guard Enabled Successfully!' });
     } else {
       return res.status(400).json({ message: 'Failed to enable guard. Invalid token or request blocked.' });
