@@ -11,11 +11,9 @@ export default async function handler(req, res) {
   const clientMutationId = 'b0316dd6-3fd6-4beb-aed4-bb29c5dc64b0';
 
   const variables = {
-    "0": {
-      is_shielded: true,
-      session_id: sessionId,
-      client_mutation_id: clientMutationId,
-    }
+    is_shielded: true,
+    session_id: sessionId,
+    client_mutation_id: clientMutationId,
   };
 
   const url = `https://graph.facebook.com/graphql?variables=${encodeURIComponent(
