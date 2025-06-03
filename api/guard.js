@@ -1,29 +1,31 @@
+import fetch from 'node-fetch';
+import { v4 as uuidv4 } from 'uuid';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { token } = req.body;
+  const { accessToken } = req.body;
 
-  if (!token || !token.startsWith('EAAG')) {
-    return res.status(400).json({ message: 'Invalid or missing token' });
+  if (!accessToken) {
+    return res.status(400).json({ error: 'Missing accessToken' });
   }
-
-  const sessionId = '9b78191c-84fd-4ab6-b0aa-19b39f04a6bc';
-  const clientMutationId = 'b0316dd6-3fd6-4beb-aed4-bb29c5dc64b0';
 
   const variables = {
     is_shielded: true,
-    session_id: sessionId,
-    client_mutation_id: clientMutationId,
+    session_id: uuidv4(),
+    client_mutation_id: uuidv4(),
   };
 
-  const graphqlUrl = `https://graph.facebook.com/graphql?variables=${encodeURIComponent(
-    JSON.stringify(variables)
-  )}&method=post&doc_id=1477043292367183&query_name=IsShieldedSetMutation&strip_defaults=false&strip_nulls=false&locale=en_US&client_country_code=US&fb_api_req_friendly_name=IsShieldedSetMutation&fb_api_caller_class=IsShieldedSetMutation&access_token=${encodeURIComponent(token)}`;
+  const params = new URLSearchParams();
+  params.append('variables', JSON.stringify(variables));
+  params.append('method', 'post');
+  params.append('doc_id', '1477043292367183');
+  params.append('access_token', accessToken);
 
   try {
-    const fbRes = await fetch(graphqlUrl, {
+    const response = await fetch(`https://graph.facebook.com/graphql?${params.toString()}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -31,16 +33,9 @@ export default async function handler(req, res) {
       },
     });
 
-    const data = await fbRes.json();
-    console.log('Facebook API Response:', data);
-
-    if (data?.data) {
-      return res.status(200).json({ message: '✅ Profile Guard Enabled!' });
-    } else {
-      return res.status(400).json({ message: '❌ Failed to enable guard', error: data.error || data });
-    }
-  } catch (err) {
-    console.error('API Error:', err);
-    return res.status(500).json({ message: 'Internal server error', error: err.message });
+    const data = await response.json();
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 }
