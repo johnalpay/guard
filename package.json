@@ -1,15 +1,18 @@
 {
-  "name": "fb-profile-guard-no-tailwind",
+  "name": "fb-profile-guard",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "next": "13.5.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "node-fetch": "^3.3.2",
+    "uuid": "^9.0.0"
   },
-  "license": "MIT"
+  "type": "module"
 }
